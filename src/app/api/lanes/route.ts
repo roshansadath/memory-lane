@@ -79,11 +79,19 @@ export const GET = withOptionalAuth(
       });
 
       // Transform data for response
-      const transformedLanes = lanes.map(lane => ({
-        ...lane,
-        memoryCount: lane._count.memories,
-        tags: lane.tags.map(lt => lt.tag),
-      }));
+      const transformedLanes = lanes.map(
+        (lane: {
+          _count: { memories: number };
+          tags: Array<{ tag: { id: string; name: string } }>;
+          [key: string]: unknown;
+        }) => ({
+          ...lane,
+          memoryCount: lane._count.memories,
+          tags: lane.tags.map(
+            (lt: { tag: { id: string; name: string } }) => lt.tag
+          ),
+        })
+      );
 
       const pagination = calculatePaginationMeta(page, limit, total);
 
@@ -172,7 +180,10 @@ export const POST = withAuth(
         return createSuccessResponse(
           {
             ...updatedLane,
-            tags: updatedLane?.tags.map(lt => lt.tag) || [],
+            tags:
+              updatedLane?.tags.map(
+                (lt: { tag: { id: string; name: string } }) => lt.tag
+              ) || [],
           },
           'Memory lane created successfully',
           201

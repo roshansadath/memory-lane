@@ -43,10 +43,12 @@ export const GET = withOptionalAuth(
       });
 
       // Transform data for response
-      const transformedTags = tags.map(tag => ({
-        ...tag,
-        laneCount: tag._count.lanes,
-      }));
+      const transformedTags = tags.map(
+        (tag: { _count: { lanes: number }; [key: string]: unknown }) => ({
+          ...tag,
+          laneCount: tag._count.lanes,
+        })
+      );
 
       return createSuccessResponse(transformedTags);
     } catch (error) {

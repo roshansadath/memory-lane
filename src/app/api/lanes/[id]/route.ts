@@ -54,7 +54,9 @@ export const GET = withOptionalAuth(
       return createSuccessResponse({
         ...lane,
         memoryCount: lane._count.memories,
-        tags: lane.tags.map(lt => lt.tag),
+        tags: lane.tags.map(
+          (lt: { tag: { id: string; name: string } }) => lt.tag
+        ),
       });
     } catch (error) {
       return handleApiError(error);
@@ -154,7 +156,10 @@ export const PUT = withAuth(
         return createSuccessResponse(
           {
             ...finalLane,
-            tags: finalLane?.tags.map(lt => lt.tag) || [],
+            tags:
+              finalLane?.tags.map(
+                (lt: { tag: { id: string; name: string } }) => lt.tag
+              ) || [],
           },
           'Memory lane updated successfully'
         );
@@ -163,7 +168,9 @@ export const PUT = withAuth(
       return createSuccessResponse(
         {
           ...updatedLane,
-          tags: updatedLane.tags.map(lt => lt.tag),
+          tags: updatedLane.tags.map(
+            (lt: { tag: { id: string; name: string } }) => lt.tag
+          ),
         },
         'Memory lane updated successfully'
       );
