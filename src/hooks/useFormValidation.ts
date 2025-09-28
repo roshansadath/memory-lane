@@ -9,8 +9,9 @@ export function useForm<T extends z.ZodType>(
   defaultValues?: Partial<z.infer<T>>
 ) {
   const form = useReactHookForm({
-    resolver: zodResolver(schema as any),
-    defaultValues: defaultValues as any,
+    // @ts-expect-error - Complex generic type constraints between Zod and React Hook Form
+    resolver: zodResolver(schema as z.ZodSchema<Record<string, unknown>>),
+    defaultValues: defaultValues as Record<string, unknown>,
   });
 
   return form;
@@ -23,17 +24,23 @@ export function useFormWithValidation<T extends z.ZodType>(
   const form = useForm(schema, defaultValues);
 
   const handleSubmit = (onSubmit: (data: z.infer<T>) => void) => {
-    return form.handleSubmit(onSubmit as any);
+    return form.handleSubmit(
+      onSubmit as (data: Record<string, unknown>) => void
+    );
   };
 
   const getFieldError = (fieldName: keyof z.infer<T>) => {
-    return (form.formState.errors as any)[fieldName]?.message as
-      | string
-      | undefined;
+    const errors = form.formState.errors as Partial<
+      Record<keyof z.infer<T>, { message?: string }>
+    >;
+    return errors[fieldName]?.message as string | undefined;
   };
 
   const isFieldValid = (fieldName: keyof z.infer<T>) => {
-    return !(form.formState.errors as any)[fieldName];
+    const errors = form.formState.errors as Partial<
+      Record<keyof z.infer<T>, unknown>
+    >;
+    return !errors[fieldName];
   };
 
   const isFormValid = form.formState.isValid;

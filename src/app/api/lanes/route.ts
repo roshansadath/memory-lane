@@ -129,7 +129,13 @@ export const POST = withAuth(
           slug,
           description,
           coverImageUrl,
-        } as any,
+        } as {
+          userId: string;
+          title: string;
+          slug: string;
+          description?: string;
+          coverImageUrl?: string;
+        },
         include: {
           memories: true,
           tags: {

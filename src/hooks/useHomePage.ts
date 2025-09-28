@@ -46,8 +46,8 @@ export function useHomePage() {
         id: tag.id,
         name: tag.name,
         color: (tag as { color?: string }).color || '#3B82F6',
-        lanes: lanesArray.filter((lane: any) =>
-          lane.tags?.some((tagItem: any) => tagItem.id === tag.id)
+        lanes: lanesArray.filter((lane: { tags?: Array<{ id: string }> }) =>
+          lane.tags?.some((tagItem: { id: string }) => tagItem.id === tag.id)
         ),
       }))
       .filter(tagData => tagData.lanes.length > 0);

@@ -68,7 +68,13 @@ async function main() {
       description: 'All the amazing outdoor adventures from summer 2024',
       coverImageUrl:
         'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop',
-    } as any,
+    } as {
+      userId: string;
+      slug: string;
+      title: string;
+      description: string;
+      coverImageUrl: string;
+    },
   });
 
   console.log('✅ Memory lane created:', memoryLane.title);
