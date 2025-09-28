@@ -4,23 +4,35 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Menu, X, Search, User } from 'lucide-react';
+import { Menu, X, Search } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { AuthModal } from '@/components/auth/AuthModal';
+import { UserMenu } from '@/components/auth/UserMenu';
 
 interface HeaderProps {
   className?: string;
   onSearchClick?: () => void;
-  onLoginClick?: () => void;
 }
 
-export function Header({
-  className,
-  onSearchClick,
-  onLoginClick,
-}: HeaderProps) {
+export function Header({ className, onSearchClick }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalTab, setAuthModalTab] = useState<'login' | 'register'>(
+    'login'
+  );
+  const { isAuthenticated, isLoading } = useAuth();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const handleAuthClick = (tab: 'login' | 'register') => {
+    setAuthModalTab(tab);
+    setIsAuthModalOpen(true);
+  };
+
+  const handleCloseAuthModal = () => {
+    setIsAuthModalOpen(false);
   };
 
   return (
@@ -78,14 +90,27 @@ export function Header({
               <span className='sr-only'>Search</span>
             </Button>
 
-            <Button
-              variant='outline'
-              onClick={onLoginClick}
-              className='flex items-center space-x-2'
-            >
-              <User className='w-4 h-4' />
-              <span>Login</span>
-            </Button>
+            {isLoading ? (
+              <div className='w-8 h-8 bg-gray-200 rounded-full animate-pulse' />
+            ) : isAuthenticated ? (
+              <UserMenu />
+            ) : (
+              <>
+                <Button
+                  variant='ghost'
+                  onClick={() => handleAuthClick('login')}
+                  className='text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white'
+                >
+                  Sign In
+                </Button>
+                <Button
+                  onClick={() => handleAuthClick('register')}
+                  className='bg-blue-600 text-white hover:bg-blue-700'
+                >
+                  Get Started
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -132,22 +157,44 @@ export function Header({
                 Explore
               </a>
               <div className='pt-4 border-t border-gray-200 dark:border-gray-700'>
-                <Button
-                  variant='outline'
-                  onClick={() => {
-                    onLoginClick?.();
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className='w-full justify-center space-x-2'
-                >
-                  <User className='w-4 h-4' />
-                  <span>Login</span>
-                </Button>
+                {isAuthenticated ? (
+                  <div className='px-3 py-2'>
+                    <UserMenu />
+                  </div>
+                ) : (
+                  <>
+                    <Button
+                      variant='ghost'
+                      onClick={() => {
+                        handleAuthClick('login');
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className='w-full justify-center'
+                    >
+                      Sign In
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        handleAuthClick('register');
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className='w-full justify-center mt-2 bg-blue-600 text-white hover:bg-blue-700'
+                    >
+                      Get Started
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </div>
         )}
       </div>
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={handleCloseAuthModal}
+        defaultTab={authModalTab}
+      />
     </header>
   );
 }

@@ -46,7 +46,7 @@ export const LaneCarousel = memo(function LaneCarousel({
             {Array.from({ length: 6 }).map((_, index) => (
               <CarouselItem
                 key={index}
-                className='pl-2 md:pl-4 basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5'
+                className='pl-2 md:pl-4 basis-3/4 sm:basis-1/2 md:basis-1/2 lg:basis-1/3 xl:basis-1/4'
               >
                 <LaneCardSkeleton />
               </CarouselItem>
@@ -91,7 +91,7 @@ export const LaneCarousel = memo(function LaneCarousel({
           {lanes.map(lane => (
             <CarouselItem
               key={lane.id}
-              className='pl-2 md:pl-4 basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5'
+              className='pl-2 md:pl-4 basis-3/4 sm:basis-1/2 md:basis-1/2 lg:basis-1/3 xl:basis-1/4'
             >
               <LaneCard
                 lane={lane}

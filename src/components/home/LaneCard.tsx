@@ -39,7 +39,7 @@ export const LaneCard = memo(function LaneCard({
   }
 
   const memoryCount = lane.memories?.length || 0;
-  const tagNames = lane.tags?.map(lt => lt.tag.name).join(', ') || '';
+  const tagNames = lane.tags?.map(tag => tag.name).join(', ') || '';
 
   return (
     <Card
@@ -47,7 +47,7 @@ export const LaneCard = memo(function LaneCard({
         'group relative overflow-hidden cursor-pointer transition-all duration-300 ease-out',
         'hover:scale-105 hover:shadow-xl hover:shadow-black/20',
         'focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2',
-        'bg-white dark:bg-gray-800',
+        'bg-white dark:bg-gray-800 min-w-[280px] w-full',
         className
       )}
       onClick={handleClick}
@@ -83,23 +83,23 @@ export const LaneCard = memo(function LaneCard({
       </div>
 
       {/* Content */}
-      <CardContent className='p-4 space-y-3'>
+      <CardContent className='p-5 space-y-4'>
         {/* Title */}
-        <h3 className='font-semibold text-lg leading-tight line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200'>
+        <h3 className='font-semibold text-xl leading-tight line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200'>
           {lane.title}
         </h3>
 
         {/* Description */}
         {lane.description && (
-          <p className='text-sm text-gray-600 dark:text-gray-300 line-clamp-2'>
+          <p className='text-sm text-gray-600 dark:text-gray-300 line-clamp-3 leading-relaxed'>
             {lane.description}
           </p>
         )}
 
         {/* Metadata */}
-        <div className='flex items-center justify-between text-xs text-gray-500 dark:text-gray-400'>
-          <div className='flex items-center space-x-1'>
-            <Calendar className='w-3 h-3' />
+        <div className='flex items-center justify-between text-sm text-gray-500 dark:text-gray-400'>
+          <div className='flex items-center space-x-2'>
+            <Calendar className='w-4 h-4' />
             <span>
               {new Date(lane.updatedAt).toLocaleDateString('en-US', {
                 month: 'short',
@@ -109,8 +109,8 @@ export const LaneCard = memo(function LaneCard({
           </div>
 
           {tagNames && (
-            <div className='flex items-center space-x-1 max-w-[50%]'>
-              <Tag className='w-3 h-3 flex-shrink-0' />
+            <div className='flex items-center space-x-2 max-w-[60%]'>
+              <Tag className='w-4 h-4 flex-shrink-0' />
               <span className='truncate' title={tagNames}>
                 {tagNames}
               </span>
@@ -132,17 +132,17 @@ export const LaneCardSkeleton = memo(function LaneCardSkeleton({
   className?: string;
 }) {
   return (
-    <Card className={cn('overflow-hidden', className)}>
+    <Card className={cn('overflow-hidden min-w-[280px] w-full', className)}>
       <div className='aspect-video'>
         <Skeleton className='w-full h-full' />
       </div>
-      <CardContent className='p-4 space-y-3'>
-        <Skeleton className='h-6 w-3/4' />
+      <CardContent className='p-5 space-y-4'>
+        <Skeleton className='h-7 w-3/4' />
         <Skeleton className='h-4 w-full' />
         <Skeleton className='h-4 w-2/3' />
         <div className='flex items-center justify-between'>
-          <Skeleton className='h-3 w-16' />
-          <Skeleton className='h-3 w-20' />
+          <Skeleton className='h-4 w-16' />
+          <Skeleton className='h-4 w-20' />
         </div>
       </CardContent>
     </Card>

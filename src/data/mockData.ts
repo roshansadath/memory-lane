@@ -141,7 +141,7 @@ export const mockMemoryLanes: MemoryLane[] = [
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-04-01'),
     memories: mockMemories.filter(mem => mem.laneId === 'lane1'),
-    tags: mockLaneTags.filter(lt => lt.laneId === 'lane1'),
+    tags: mockLaneTags.filter(lt => lt.laneId === 'lane1').map(lt => lt.tag),
   },
   {
     id: 'lane2',
@@ -153,7 +153,7 @@ export const mockMemoryLanes: MemoryLane[] = [
     createdAt: new Date('2024-01-15'),
     updatedAt: new Date('2024-03-30'),
     memories: mockMemories.filter(mem => mem.laneId === 'lane2'),
-    tags: mockLaneTags.filter(lt => lt.laneId === 'lane2'),
+    tags: mockLaneTags.filter(lt => lt.laneId === 'lane2').map(lt => lt.tag),
   },
   {
     id: 'lane3',
@@ -165,7 +165,7 @@ export const mockMemoryLanes: MemoryLane[] = [
     createdAt: new Date('2024-02-01'),
     updatedAt: new Date('2024-04-10'),
     memories: mockMemories.filter(mem => mem.laneId === 'lane3'),
-    tags: mockLaneTags.filter(lt => lt.laneId === 'lane3'),
+    tags: mockLaneTags.filter(lt => lt.laneId === 'lane3').map(lt => lt.tag),
   },
   {
     id: 'lane4',
@@ -177,7 +177,7 @@ export const mockMemoryLanes: MemoryLane[] = [
     createdAt: new Date('2024-01-20'),
     updatedAt: new Date('2024-03-15'),
     memories: [],
-    tags: mockLaneTags.filter(lt => lt.laneId === 'lane4'),
+    tags: mockLaneTags.filter(lt => lt.laneId === 'lane4').map(lt => lt.tag),
   },
   {
     id: 'lane5',
@@ -189,14 +189,14 @@ export const mockMemoryLanes: MemoryLane[] = [
     createdAt: new Date('2024-01-10'),
     updatedAt: new Date('2024-02-28'),
     memories: [],
-    tags: mockLaneTags.filter(lt => lt.laneId === 'lane5'),
+    tags: mockLaneTags.filter(lt => lt.laneId === 'lane5').map(lt => lt.tag),
   },
 ];
 
 // Helper function to get lanes by tag
 export function getLanesByTag(tagId: string): MemoryLane[] {
   return mockMemoryLanes.filter(lane =>
-    lane.tags.some(lt => lt.tagId === tagId)
+    lane.tags.some(tag => tag.id === tagId)
   );
 }
 
