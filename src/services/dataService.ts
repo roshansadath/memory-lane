@@ -107,7 +107,7 @@ export class DataService {
       lane =>
         lane.title.toLowerCase().includes(searchTerm) ||
         lane.description?.toLowerCase().includes(searchTerm) ||
-        lane.tags.some(lt => lt.tag.name.toLowerCase().includes(searchTerm))
+        lane.tags.some(tag => tag.name.toLowerCase().includes(searchTerm))
     );
 
     return {

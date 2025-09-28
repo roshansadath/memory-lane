@@ -9,7 +9,7 @@ export interface MemoryLane {
   createdAt: Date;
   updatedAt: Date;
   memories: Memory[];
-  tags: LaneTag[];
+  tags: Tag[]; // Changed from LaneTag[] to Tag[] to match API response
 }
 
 export interface Memory {
@@ -106,11 +106,43 @@ export interface CreateTagForm {
 }
 
 // Auth types
+export interface User {
+  id: string;
+  email: string;
+  name?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface AuthUser {
   id: string;
   isAuthenticated: boolean;
 }
 
-export interface LoginForm {
+export interface AuthResponse {
+  user: User;
+  token: string;
+}
+
+export interface LoginCredentials {
+  email: string;
   password: string;
+}
+
+export interface RegisterCredentials {
+  email: string;
+  password: string;
+  name?: string;
+}
+
+export interface LoginForm {
+  email: string;
+  password: string;
+}
+
+export interface RegisterForm {
+  email: string;
+  password: string;
+  confirmPassword: string;
+  name?: string;
 }
