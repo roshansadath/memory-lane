@@ -115,3 +115,128 @@ src/components/
 - Integrate carousels and lane cards
 - Add loading and empty states
 - Implement responsive design
+
+
+
+# HomePage Backend, Auth and API
+
+Perfect! Thank you for providing the SQL schema. I can see it's well-structured and I'll build upon it. Here's my updated plan:
+
+## **Updated Backend Development Plan**
+
+### **Phase 1: Database Schema & Dependencies Setup**
+
+#### **1.1 Create Prisma Schema**
+- Convert the provided SQL schema to Prisma format
+- Add `userId` foreign key to `MemoryLane` table (missing from SQL)
+- Add proper indexes and constraints
+- Set up Supabase as the database provider
+
+#### **1.2 Add Required Dependencies**
+```json
+{
+  "prisma": "^5.0.0",
+  "@prisma/client": "^5.0.0", 
+  "bcryptjs": "^2.4.3",
+  "jsonwebtoken": "^9.0.2",
+  "@types/bcryptjs": "^2.4.6",
+  "@types/jsonwebtoken": "^9.0.5"
+}
+```
+
+#### **1.3 Environment Variables**
+Add to `.env`:
+```
+DATABASE_URL="postgresql://..."
+JWT_SECRET="your-jwt-secret"
+JWT_EXPIRES_IN="2h"
+```
+
+### **Phase 2: Authentication System**
+
+#### **2.1 Auth Utilities** (`src/lib/auth.ts`)
+- Password hashing with bcryptjs
+- JWT token generation/verification (2-hour expiration)
+- User session management
+
+#### **2.2 Auth API Routes**
+- `POST /api/auth/register` - User registration with email/password
+- `POST /api/auth/login` - User login
+- `POST /api/auth/logout` - Clear session
+- `GET /api/auth/me` - Get current user info
+
+#### **2.3 Auth Middleware** (`src/lib/middleware.ts`)
+- JWT verification for protected routes
+- User context injection
+
+### **Phase 3: CRUD API Routes**
+
+#### **3.1 Memory Lanes API**
+- `GET /api/lanes` - Get user's memory lanes (with memories count)
+- `POST /api/lanes` - Create new memory lane
+- `GET /api/lanes/[id]` - Get specific lane with memories
+- `PUT /api/lanes/[id]` - Update lane
+- `DELETE /api/lanes/[id]` - Delete lane
+
+#### **3.2 Memories API**
+- `GET /api/lanes/[id]/memories` - Get memories for a lane
+- `POST /api/lanes/[id]/memories` - Create memory
+- `PUT /api/memories/[id]` - Update memory
+- `DELETE /api/memories/[id]` - Delete memory
+
+#### **3.3 Memory Images API**
+- `POST /api/memories/[id]/images` - Upload memory images
+- `DELETE /api/images/[id]` - Delete image
+
+#### **3.4 Tags API**
+- `GET /api/tags` - Get all tags
+- `POST /api/tags` - Create new tag
+- `PUT /api/tags/[id]` - Update tag
+
+### **Phase 4: Frontend Integration**
+
+#### **4.1 Update Data Service**
+- Replace mock data calls with real API calls
+- Add authentication headers to requests
+
+#### **4.2 Add Auth Context**
+- User session management
+- Login/logout functionality
+- Protected route handling
+
+#### **4.3 Update Hooks**
+- Modify `useMemoryLanes` to work with authenticated API
+- Add loading and error states
+
+### **Key Improvements from SQL Schema:**
+1. **Add `userId` to MemoryLane** - Essential for user-scoped data
+2. **Add `color` field to Tag** - Great for UI differentiation
+3. **Proper timestamps** - Using `createdAt` and `updatedAt` consistently
+4. **Foreign key constraints** - Maintain data integrity
+5. **Cascade deletes** - When lane is deleted, delete associated memories
+
+### **API Response Format:**
+```typescript
+// Success response
+{
+  success: true,
+  data: T,
+  message?: string
+}
+
+// Error response  
+{
+  success: false,
+  error: string,
+  message?: string
+}
+```
+
+### **Security Considerations:**
+- Password hashing with bcryptjs
+- JWT tokens with 2-hour expiration
+- User-scoped data access (users can only access their own data)
+- Input validation with Zod schemas
+- SQL injection prevention via Prisma
+
+**Would you like me to start with Phase 1 - creating the Prisma schema and setting up dependencies?**

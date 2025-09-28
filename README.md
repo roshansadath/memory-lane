@@ -53,7 +53,9 @@ A simple React + Next.js + TypeScript application for creating and sharing *memo
 - *Memory Lane Page*
   - Chronological timeline of memories.
   - Each memory has a title, description, timestamp, and ≥1 image.
-  - Editor mode allows add/edit/delete.
+  - User is allowed to click on the options to add/edit/delete memories.
+  - The user is prompted to login with their credentials to add/edit/delete memories.
+  - Only the user's with userId matching with the userId of the memorylane are allowed to make changes to those memories.
 
 - *Authentication*
   - Simple password login.
