@@ -76,7 +76,7 @@ function ToastContainer({
   if (toasts.length === 0) return null;
 
   return (
-    <div className='fixed top-4 right-4 z-50 space-y-2'>
+    <div className='fixed top-4 right-4 sm:top-6 sm:right-6 z-50 space-y-3 max-w-sm px-4 sm:px-0'>
       {toasts.map(toast => (
         <ToastItem key={toast.id} toast={toast} onRemove={onRemove} />
       ))}
@@ -111,7 +111,7 @@ function ToastItem({
       case 'success':
         return (
           <svg
-            className='h-5 w-5 text-green-400'
+            className='h-10 w-20 text-green-400'
             fill='currentColor'
             viewBox='0 0 20 20'
           >
@@ -125,7 +125,7 @@ function ToastItem({
       case 'error':
         return (
           <svg
-            className='h-5 w-5 text-red-400'
+            className='h-10 w-20 text-red-400'
             fill='currentColor'
             viewBox='0 0 20 20'
           >
@@ -139,7 +139,7 @@ function ToastItem({
       case 'warning':
         return (
           <svg
-            className='h-5 w-5 text-yellow-400'
+            className='h-10 w-20 text-yellow-400'
             fill='currentColor'
             viewBox='0 0 20 20'
           >
@@ -153,7 +153,7 @@ function ToastItem({
       case 'info':
         return (
           <svg
-            className='h-5 w-5 text-blue-400'
+            className='h-10 w-20 text-blue-400'
             fill='currentColor'
             viewBox='0 0 20 20'
           >
@@ -171,20 +171,20 @@ function ToastItem({
 
   return (
     <div
-      className={`max-w-sm w-full border rounded-lg shadow-lg p-4 ${getToastStyles()}`}
+      className={`w-full border rounded-lg shadow-lg p-4 backdrop-blur-sm ${getToastStyles()}`}
     >
       <div className='flex items-start'>
         <div className='flex-shrink-0'>{getIcon()}</div>
-        <div className='ml-3 w-0 flex-1'>
-          <p className='text-sm font-medium'>{toast.title}</p>
+        <div className='ml-3 flex-1 min-w-0'>
+          <p className='text-sm font-medium text-gray-900'>{toast.title}</p>
           {toast.message && (
-            <p className='mt-1 text-sm opacity-90'>{toast.message}</p>
+            <p className='mt-1 text-sm text-gray-700'>{toast.message}</p>
           )}
         </div>
         <div className='ml-4 flex-shrink-0 flex'>
           <button
             onClick={() => onRemove(toast.id)}
-            className='inline-flex text-gray-400 hover:text-gray-600 focus:outline-none'
+            className='inline-flex text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300 rounded'
           >
             <svg className='h-5 w-5' fill='currentColor' viewBox='0 0 20 20'>
               <path
