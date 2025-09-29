@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Menu, X, Search } from 'lucide-react';
@@ -38,9 +39,18 @@ export function Header({ className, onSearchClick }: HeaderProps) {
         <div className='flex justify-between items-center h-16'>
           {/* Logo */}
           <div className='flex items-center'>
-            <Link href='/' className='flex items-center space-x-2'>
-              <div className='w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center'>
-                <span className='text-white font-bold text-lg'>M</span>
+            <Link
+              href='/'
+              className='flex items-center space-x-3 hover:opacity-80 transition-opacity'
+            >
+              <div className='relative w-12 h-12'>
+                <Image
+                  src='/Logo.png'
+                  alt='Memory Lane Logo'
+                  fill
+                  className='object-contain'
+                  priority
+                />
               </div>
               <span className='text-xl font-bold text-gray-900 dark:text-white'>
                 Memory Lane
@@ -61,12 +71,6 @@ export function Header({ className, onSearchClick }: HeaderProps) {
               className='text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors font-medium'
             >
               My Lanes
-            </Link>
-            <Link
-              href='/explore'
-              className='text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors font-medium'
-            >
-              Explore
             </Link>
           </nav>
 
