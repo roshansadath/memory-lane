@@ -8,12 +8,14 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   defaultTab?: 'login' | 'register';
+  redirectAfterAuth?: string;
 }
 
 export function AuthModal({
   isOpen,
   onClose,
   defaultTab = 'login',
+  redirectAfterAuth,
 }: AuthModalProps) {
   const [activeTab, setActiveTab] = useState<'login' | 'register'>(defaultTab);
 
@@ -21,6 +23,9 @@ export function AuthModal({
 
   const handleSuccess = () => {
     onClose();
+    if (redirectAfterAuth) {
+      window.location.href = redirectAfterAuth;
+    }
   };
 
   const handleBackdropClick = (e: React.MouseEvent) => {
