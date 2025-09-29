@@ -2,6 +2,7 @@
 
 export interface MemoryLane {
   id: string;
+  userId: string;
   slug: string;
   title: string;
   description?: string;
@@ -99,6 +100,13 @@ export interface CreateMemoryForm {
   description?: string;
   occurredAt: Date;
   images: File[];
+}
+
+export interface CreateMemoryData {
+  title: string;
+  description?: string;
+  occurredAt: string;
+  images: MemoryImage[];
 }
 
 export interface CreateTagForm {
