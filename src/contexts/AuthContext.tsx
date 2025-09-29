@@ -1,7 +1,15 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { User, LoginCredentials, RegisterCredentials } from '@/types';
+import { queryKeys } from '@/hooks/useMemoryLanes';
 
 interface AuthContextType {
   user: User | null;
@@ -18,18 +26,23 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
 
   const isAuthenticated = !!user;
 
-  // Check for existing token on mount
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      refreshUser();
-    } else {
-      setIsLoading(false);
-    }
-  }, []);
+  // Helper function to clear user-specific data
+  const clearUserData = useCallback(() => {
+    // Clear user-specific queries
+    queryClient.invalidateQueries({ queryKey: queryKeys.lists() });
+    queryClient.invalidateQueries({ queryKey: queryKeys.homePage() });
+    queryClient.invalidateQueries({ queryKey: queryKeys.tagsWithLanes() });
+    // Clear all "My Lanes" queries (regardless of user ID)
+    queryClient.removeQueries({ queryKey: [...queryKeys.lists(), 'my'] });
+    // Clear all memory lane details
+    queryClient.removeQueries({ queryKey: queryKeys.details() });
+    // Clear any user-specific search results
+    queryClient.removeQueries({ queryKey: ['memoryLanes', 'search'] });
+  }, [queryClient]);
 
   const login = async (credentials: LoginCredentials) => {
     try {
@@ -50,6 +63,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (data.success) {
         localStorage.setItem('token', data.data.token);
         setUser(data.data.user);
+        // Clear user-specific data when new user logs in
+        clearUserData();
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -76,6 +91,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (data.success) {
         localStorage.setItem('token', data.data.token);
         setUser(data.data.user);
+        // Clear user-specific data when new user registers
+        clearUserData();
       }
     } catch (error) {
       console.error('Registration error:', error);
@@ -86,9 +103,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
+    // Clear user-specific data when user logs out
+    clearUserData();
   };
 
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -110,15 +129,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Token is invalid, clear it
         localStorage.removeItem('token');
         setUser(null);
+        // Clear user-specific data when user is cleared due to invalid token
+        clearUserData();
       }
     } catch (error) {
       console.error('Refresh user error:', error);
       localStorage.removeItem('token');
       setUser(null);
+      // Clear user-specific data when user is cleared due to error
+      clearUserData();
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [clearUserData]);
+
+  // Check for existing token on mount
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      refreshUser();
+    } else {
+      setIsLoading(false);
+    }
+  }, [refreshUser]);
 
   const value = {
     user,
