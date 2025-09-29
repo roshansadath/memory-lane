@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { supabaseAdmin } from './supabase';
 
 export interface ImageUploadResult {
   url: string;
@@ -7,7 +7,7 @@ export interface ImageUploadResult {
 }
 
 /**
- * Upload base64 image to Supabase Storage
+ * Upload base64 image to Supabase Storage using admin client
  */
 export async function uploadImageToSupabase(
   base64DataUrl: string,
@@ -15,6 +15,12 @@ export async function uploadImageToSupabase(
   folder: string = 'memories'
 ): Promise<ImageUploadResult> {
   try {
+    if (!supabaseAdmin) {
+      throw new Error(
+        'Supabase admin client not available. Please check SUPABASE_SERVICE_ROLE_KEY environment variable.'
+      );
+    }
+
     // Parse base64 data URL
     const matches = base64DataUrl.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
     if (!matches || matches.length !== 3) {
@@ -35,8 +41,8 @@ export async function uploadImageToSupabase(
     // Convert base64 to buffer
     const buffer = Buffer.from(base64Data, 'base64');
 
-    // Upload to Supabase Storage
-    const { data, error } = await supabase.storage
+    // Upload to Supabase Storage using admin client (bypasses RLS)
+    const { data, error } = await supabaseAdmin.storage
       .from(bucketName)
       .upload(filename, buffer, {
         contentType: mimeType,
@@ -52,7 +58,7 @@ export async function uploadImageToSupabase(
     // Get public URL
     const {
       data: { publicUrl },
-    } = supabase.storage.from(bucketName).getPublicUrl(filename);
+    } = supabaseAdmin.storage.from(bucketName).getPublicUrl(filename);
 
     return {
       url: publicUrl,
@@ -95,6 +101,12 @@ export async function deleteImageFromSupabase(
   bucketName: string = 'memory-images'
 ): Promise<void> {
   try {
+    if (!supabaseAdmin) {
+      throw new Error(
+        'Supabase admin client not available. Please check SUPABASE_SERVICE_ROLE_KEY environment variable.'
+      );
+    }
+
     // Extract path from URL
     const url = new URL(imageUrl);
     const pathParts = url.pathname.split('/');
@@ -106,7 +118,7 @@ export async function deleteImageFromSupabase(
 
     const filePath = pathParts.slice(bucketIndex + 1).join('/');
 
-    const { error } = await supabase.storage
+    const { error } = await supabaseAdmin.storage
       .from(bucketName)
       .remove([filePath]);
 
