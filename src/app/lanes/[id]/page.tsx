@@ -1,12 +1,15 @@
 'use client';
 
 import { useParams } from 'next/navigation';
+import { useState } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { MemoryLaneHeader } from '@/components/lanes/MemoryLaneHeader';
 import { MemoryTimeline } from '@/components/lanes/MemoryTimeline';
 import { MemoryLaneSkeleton } from '@/components/lanes/MemoryLaneSkeleton';
 import { MemoryLaneErrorBoundary } from '@/components/lanes/MemoryLaneErrorBoundary';
+import { DeleteLaneDialog } from '@/components/lanes/DeleteLaneDialog';
 import { useMemoryLane } from '@/hooks/useMemoryLanes';
+import { useMemoryLaneManagement } from '@/hooks/useMemoryLaneManagement';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 
@@ -14,12 +17,15 @@ export default function MemoryLanePage() {
   const params = useParams();
   const laneId = params.id as string;
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const {
     data: lane,
     isLoading: laneLoading,
     error: laneError,
   } = useMemoryLane(laneId);
+
+  const { deleteMemoryLane, isDeleting } = useMemoryLaneManagement();
 
   // Check if the current user owns this lane
   const isOwner = Boolean(
@@ -34,6 +40,17 @@ export default function MemoryLanePage() {
     isOwner,
     userIdMatch: user && lane ? user.id === lane.userId : false,
   });
+
+  // Handle delete lane
+  const handleDeleteLane = async () => {
+    try {
+      await deleteMemoryLane(laneId);
+      setShowDeleteDialog(false);
+    } catch (error) {
+      console.error('Failed to delete lane:', error);
+      // Error handling is done in the hook
+    }
+  };
 
   // Debug logging
   console.log('Memory Lane Page Debug:', {
@@ -113,7 +130,7 @@ export default function MemoryLanePage() {
             lane={lane}
             isOwner={isOwner}
             onEditLane={() => console.log('Edit lane:', lane.id)}
-            onDeleteLane={() => console.log('Delete lane:', lane.id)}
+            onDeleteLane={() => setShowDeleteDialog(true)}
           />
 
           {/* Memory Timeline */}
@@ -121,6 +138,15 @@ export default function MemoryLanePage() {
             laneId={lane.id}
             isAuthenticated={isAuthenticated}
             isOwner={isOwner}
+          />
+
+          {/* Delete Confirmation Dialog */}
+          <DeleteLaneDialog
+            isOpen={showDeleteDialog}
+            onClose={() => setShowDeleteDialog(false)}
+            onConfirm={handleDeleteLane}
+            laneTitle={lane.title}
+            isDeleting={isDeleting}
           />
         </div>
       </MemoryLaneErrorBoundary>
