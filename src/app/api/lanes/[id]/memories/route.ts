@@ -12,6 +12,7 @@ import {
   calculatePaginationMeta,
   getSortParams,
 } from '@/lib/pagination';
+import { processImagesToSupabase } from '@/lib/imageStorage';
 import { User } from '@/types';
 
 /**
@@ -132,8 +133,22 @@ export const POST = withAuth(
 
       // Create memory images if provided
       if (images.length > 0) {
+        // Check if images are base64 (old format) or already uploaded URLs
+        const isBase64Images = images.some(img => img.startsWith('data:'));
+
+        let imageUrls = images;
+
+        if (isBase64Images) {
+          // Upload base64 images to Supabase Storage
+          imageUrls = await processImagesToSupabase(
+            images,
+            'memory-images',
+            `memories/${memory.id}`
+          );
+        }
+
         await prisma.memoryImage.createMany({
-          data: images.map((url, index) => ({
+          data: imageUrls.map((url, index) => ({
             memoryId: memory.id,
             url,
             sortIndex: index,
