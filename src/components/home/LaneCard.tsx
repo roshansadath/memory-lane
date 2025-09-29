@@ -5,8 +5,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
-import { Calendar, Image as ImageIcon, Tag } from 'lucide-react';
-import { memo } from 'react';
+import { Calendar, Image as ImageIcon, Tag, Share2, Check } from 'lucide-react';
+import { memo, useState } from 'react';
+import { useToast } from '@/components/ui/Toast';
 
 interface LaneCardProps {
   lane: MemoryLane;
@@ -21,9 +22,74 @@ export const LaneCard = memo(function LaneCard({
   className,
   isLoading = false,
 }: LaneCardProps) {
+  const [isCopied, setIsCopied] = useState(false);
+  const { addToast } = useToast();
+
   const handleClick = () => {
     if (onClick && !isLoading) {
       onClick(lane);
+    }
+  };
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
+    console.log('Share button clicked for lane:', lane.id);
+
+    try {
+      const url = `${window.location.origin}/lanes/${lane.id}`;
+      console.log('Attempting to copy URL:', url);
+
+      await navigator.clipboard.writeText(url);
+      console.log('Successfully copied to clipboard');
+      setIsCopied(true);
+      addToast({
+        type: 'success',
+        title: 'Link Copied!',
+        message: 'Memory lane link has been copied to your clipboard.',
+        duration: 3000,
+      });
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy link:', error);
+      // Fallback for older browsers
+      try {
+        const textArea = document.createElement('textarea');
+        textArea.value = `${window.location.origin}/lanes/${lane.id}`;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        console.log('Successfully copied using fallback method');
+        setIsCopied(true);
+        addToast({
+          type: 'success',
+          title: 'Link Copied!',
+          message: 'Memory lane link has been copied to your clipboard.',
+          duration: 3000,
+        });
+        setTimeout(() => setIsCopied(false), 2000);
+      } catch (fallbackError) {
+        console.error('Fallback copy also failed:', fallbackError);
+        addToast({
+          type: 'error',
+          title: 'Copy Failed',
+          message: 'Unable to copy link automatically. Please copy manually.',
+          duration: 5000,
+        });
+        // Show a prompt with the URL as a last resort
+        const userInput = prompt(
+          'Copy this link manually:',
+          `${window.location.origin}/lanes/${lane.id}`
+        );
+        if (userInput) {
+          addToast({
+            type: 'info',
+            title: 'Link Ready',
+            message: 'You can now paste the link wherever you need it.',
+            duration: 3000,
+          });
+        }
+      }
     }
   };
 
@@ -87,8 +153,21 @@ export const LaneCard = memo(function LaneCard({
           {memoryCount} {memoryCount === 1 ? 'memory' : 'memories'}
         </div>
 
+        {/* Share button */}
+        <button
+          onClick={handleShare}
+          className='absolute top-3 left-3 bg-white/90 dark:bg-gray-800/90 text-gray-900 dark:text-white p-2 rounded-full backdrop-blur-sm shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white dark:hover:bg-gray-800 hover:scale-110 z-10'
+          title={isCopied ? 'Link copied!' : 'Share lane'}
+        >
+          {isCopied ? (
+            <Check className='w-4 h-4 text-green-600' />
+          ) : (
+            <Share2 className='w-4 h-4' />
+          )}
+        </button>
+
         {/* Hover overlay with action hint */}
-        <div className='absolute inset-0 bg-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center'>
+        <div className='absolute inset-0 bg-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none'>
           <div className='bg-white/90 dark:bg-gray-800/90 text-blue-600 dark:text-blue-400 px-4 py-2 rounded-full font-semibold text-sm shadow-lg'>
             View Lane →
           </div>

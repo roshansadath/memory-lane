@@ -5,7 +5,7 @@ import { useHomePage } from '@/hooks/useHomePage';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuthModal } from '@/contexts/AuthModalContext';
 import { useCreateMemoryLane } from '@/hooks/useCreateMemoryLane';
-import { TagSection } from './TagSection';
+import { TagFilter } from './TagFilter';
 import { HomePageError } from './HomePageError';
 import { HomePageSkeleton } from './HomePageSkeleton';
 import { EmptyState } from './EmptyState';
@@ -28,7 +28,7 @@ export const HomePage = memo(function HomePage({
 }: HomePageProps) {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { openModal } = useAuthModal();
-  const { tagsWithLanes, featuredLanes, isLoading, error } = useHomePage();
+  const { featuredLanes, isLoading, error } = useHomePage();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const createMemoryLaneMutation = useCreateMemoryLane();
 
@@ -148,15 +148,11 @@ export const HomePage = memo(function HomePage({
           <FeaturedSection lanes={featuredLanes} onLaneClick={onLaneClick} />
         )}
 
-        {/* Show tag sections for all users */}
-        {tagsWithLanes.length > 0 ? (
-          <TagSectionsList
-            tagsWithLanes={tagsWithLanes}
-            onLaneClick={onLaneClick}
-          />
-        ) : featuredLanes.length === 0 ? (
-          <EmptyState />
-        ) : null}
+        {/* Tag Filter Section */}
+        <TagFilter onLaneClick={onLaneClick} />
+
+        {/* Show empty state only if no featured lanes and no tag filter is active */}
+        {featuredLanes.length === 0 && <EmptyState />}
       </div>
 
       {/* Create Memory Lane Modal */}
@@ -168,31 +164,3 @@ export const HomePage = memo(function HomePage({
     </div>
   );
 });
-
-// Helper component for tag sections list
-function TagSectionsList({
-  tagsWithLanes,
-  onLaneClick,
-}: {
-  tagsWithLanes: Array<{ id: string; name: string; lanes: MemoryLane[] }>;
-  onLaneClick?: (lane: MemoryLane) => void;
-}) {
-  return (
-    <div className='space-y-16'>
-      {tagsWithLanes.map((tagData, index) => (
-        <div key={tagData.id} className='relative'>
-          {/* Section divider for visual separation */}
-          {index > 0 && (
-            <div className='absolute -top-8 left-1/2 transform -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent'></div>
-          )}
-          <TagSection
-            tag={tagData}
-            lanes={tagData.lanes}
-            onLaneClick={onLaneClick}
-            showNavigation={tagData.lanes.length > 4}
-          />
-        </div>
-      ))}
-    </div>
-  );
-}

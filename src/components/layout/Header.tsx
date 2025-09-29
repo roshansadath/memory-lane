@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Menu, X, Search } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuthModal } from '@/contexts/AuthModalContext';
 import { UserMenu } from '@/components/auth/UserMenu';
@@ -15,7 +15,7 @@ interface HeaderProps {
   onSearchClick?: () => void;
 }
 
-export function Header({ className, onSearchClick }: HeaderProps) {
+export function Header({ className }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isAuthenticated, isLoading } = useAuth();
   const { openModal } = useAuthModal();
@@ -76,16 +76,6 @@ export function Header({ className, onSearchClick }: HeaderProps) {
 
           {/* Desktop Actions */}
           <div className='hidden md:flex items-center space-x-4'>
-            <Button
-              variant='ghost'
-              size='icon'
-              onClick={onSearchClick}
-              className='text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white'
-            >
-              <Search className='w-5 h-5' />
-              <span className='sr-only'>Search</span>
-            </Button>
-
             {isLoading ? (
               <div className='w-8 h-8 bg-gray-200 rounded-full animate-pulse' />
             ) : isAuthenticated ? (

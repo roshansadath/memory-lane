@@ -113,6 +113,34 @@ class ApiService {
     return this.handleResponse<ApiResponse<MemoryLane>>(response);
   }
 
+  async getMyMemoryLanes(params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    tagId?: string;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  }) {
+    const searchParams = new URLSearchParams();
+
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          searchParams.append(key, value.toString());
+        }
+      });
+    }
+
+    const response = await fetch(
+      `${API_BASE_URL}/api/lanes/my?${searchParams}`,
+      {
+        headers: this.getAuthHeaders(),
+      }
+    );
+
+    return this.handleResponse<PaginatedApiResponse<MemoryLane>>(response);
+  }
+
   // Memory Lanes endpoints - Authenticated (for creating/updating/deleting)
   async createMemoryLane(data: {
     title: string;

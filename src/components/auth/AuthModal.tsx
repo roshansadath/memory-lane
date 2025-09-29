@@ -36,10 +36,10 @@ export function AuthModal({
 
   return (
     <div
-      className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50'
+      className='fixed inset-0 bg-white bg-opacity-100 flex items-center justify-center p-4 z-50'
       onClick={handleBackdropClick}
     >
-      <div className='relative'>
+      <div className='relative w-full max-w-md'>
         <button
           onClick={onClose}
           className='absolute -top-2 -right-2 bg-white rounded-full p-2 shadow-lg hover:bg-gray-50 z-10'

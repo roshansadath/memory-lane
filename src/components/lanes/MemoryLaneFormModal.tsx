@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Tag } from '@/types';
+import { Tag, MemoryLane } from '@/types';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -40,6 +40,7 @@ interface MemoryLaneFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: MemoryLaneFormData & { tagIds: string[] }) => Promise<void>;
+  lane?: MemoryLane | null; // For edit mode
   className?: string;
 }
 
@@ -47,6 +48,7 @@ export const MemoryLaneFormModal = memo(function MemoryLaneFormModal({
   isOpen,
   onClose,
   onSubmit,
+  lane,
   className,
 }: MemoryLaneFormModalProps) {
   const [coverImage, setCoverImage] = useState<string | null>(null);
@@ -54,6 +56,14 @@ export const MemoryLaneFormModal = memo(function MemoryLaneFormModal({
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [newTagName, setNewTagName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [originalData, setOriginalData] = useState<{
+    title: string;
+    description: string;
+    coverImageUrl: string;
+    tagIds: string[];
+  } | null>(null);
+
+  const isEditMode = !!lane;
 
   const {
     register,
@@ -61,6 +71,7 @@ export const MemoryLaneFormModal = memo(function MemoryLaneFormModal({
     formState: { errors, isDirty },
     reset,
     setValue,
+    watch,
   } = useForm<MemoryLaneFormData>({
     resolver: zodResolver(memoryLaneFormSchema),
     defaultValues: {
@@ -69,6 +80,8 @@ export const MemoryLaneFormModal = memo(function MemoryLaneFormModal({
       coverImageUrl: '',
     },
   });
+
+  const data = watch();
 
   // Load available tags when modal opens
   useEffect(() => {
@@ -80,16 +93,36 @@ export const MemoryLaneFormModal = memo(function MemoryLaneFormModal({
   // Reset form when modal opens/closes
   useEffect(() => {
     if (isOpen) {
-      reset({
-        title: '',
-        description: '',
-        coverImageUrl: '',
-      });
-      setCoverImage(null);
-      setSelectedTags([]);
+      if (lane) {
+        // Edit mode - populate form with existing data
+        const laneData = {
+          title: lane.title,
+          description: lane.description || '',
+          coverImageUrl: lane.coverImageUrl || '',
+          tagIds: lane.tags?.map(tag => tag.id) || [],
+        };
+        reset({
+          title: laneData.title,
+          description: laneData.description,
+          coverImageUrl: laneData.coverImageUrl,
+        });
+        setCoverImage(lane.coverImageUrl || null);
+        setSelectedTags(lane.tags || []);
+        setOriginalData(laneData);
+      } else {
+        // Create mode - reset to defaults
+        reset({
+          title: '',
+          description: '',
+          coverImageUrl: '',
+        });
+        setCoverImage(null);
+        setSelectedTags([]);
+        setOriginalData(null);
+      }
       setNewTagName('');
     }
-  }, [isOpen, reset]);
+  }, [isOpen, lane, reset]);
 
   const loadTags = async () => {
     try {
@@ -187,6 +220,27 @@ export const MemoryLaneFormModal = memo(function MemoryLaneFormModal({
     }
   };
 
+  // Check if form has changed from original data
+  const hasFormChanged = () => {
+    if (!isEditMode || !originalData) return isDirty;
+
+    const currentData = {
+      title: data.title || '',
+      description: data.description || '',
+      coverImageUrl: coverImage || '',
+      tagIds: selectedTags.map(tag => tag.id).sort(),
+    };
+
+    const originalTagIds = originalData.tagIds.sort();
+
+    return (
+      currentData.title !== originalData.title ||
+      currentData.description !== originalData.description ||
+      currentData.coverImageUrl !== originalData.coverImageUrl ||
+      JSON.stringify(currentData.tagIds) !== JSON.stringify(originalTagIds)
+    );
+  };
+
   const handleFormSubmit = async (data: MemoryLaneFormData) => {
     setIsSubmitting(true);
     try {
@@ -220,7 +274,7 @@ export const MemoryLaneFormModal = memo(function MemoryLaneFormModal({
       >
         <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-4'>
           <CardTitle className='text-xl font-semibold'>
-            Create Memory Lane
+            {isEditMode ? 'Edit Memory Lane' : 'Create Memory Lane'}
           </CardTitle>
           <Button
             variant='ghost'
@@ -394,18 +448,18 @@ export const MemoryLaneFormModal = memo(function MemoryLaneFormModal({
               </Button>
               <Button
                 type='submit'
-                disabled={isSubmitting || !isDirty}
+                disabled={isSubmitting || !hasFormChanged()}
                 className='flex items-center gap-2'
               >
                 {isSubmitting ? (
                   <>
                     <div className='w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin' />
-                    Creating...
+                    {isEditMode ? 'Updating...' : 'Creating...'}
                   </>
                 ) : (
                   <>
                     <ImageIcon className='w-4 h-4' />
-                    Create Memory Lane
+                    {isEditMode ? 'Update Memory Lane' : 'Create Memory Lane'}
                   </>
                 )}
               </Button>

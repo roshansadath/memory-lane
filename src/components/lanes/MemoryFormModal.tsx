@@ -45,6 +45,7 @@ export const MemoryFormModal = memo(function MemoryFormModal({
   className,
 }: MemoryFormModalProps) {
   const [images, setImages] = useState<MemoryImage[]>([]);
+  const [originalImages, setOriginalImages] = useState<MemoryImage[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -75,7 +76,9 @@ export const MemoryFormModal = memo(function MemoryFormModal({
           'occurredAt',
           new Date(memory.occurredAt).toISOString().split('T')[0]
         );
-        setImages(memory.images || []);
+        const memoryImages = memory.images || [];
+        setImages(memoryImages);
+        setOriginalImages(memoryImages);
       } else {
         // Create mode - reset to defaults
         reset({
@@ -84,6 +87,7 @@ export const MemoryFormModal = memo(function MemoryFormModal({
           occurredAt: new Date().toISOString().split('T')[0],
         });
         setImages([]);
+        setOriginalImages([]);
       }
     }
   }, [isOpen, memory, setValue, reset]);
@@ -94,6 +98,17 @@ export const MemoryFormModal = memo(function MemoryFormModal({
 
   const handleImageRemove = (imageId: string) => {
     setImages(prev => prev.filter(img => img.id !== imageId));
+  };
+
+  // Check if images have changed from original
+  const imagesHaveChanged = () => {
+    if (originalImages.length !== images.length) return true;
+
+    // Check if any image URLs have changed
+    const originalUrls = originalImages.map(img => img.url).sort();
+    const currentUrls = images.map(img => img.url).sort();
+
+    return JSON.stringify(originalUrls) !== JSON.stringify(currentUrls);
   };
 
   const handleFormSubmit = async (data: MemoryFormData) => {
@@ -264,7 +279,11 @@ export const MemoryFormModal = memo(function MemoryFormModal({
               </Button>
               <Button
                 type='submit'
-                disabled={isSubmitting || !isDirty || images.length === 0}
+                disabled={
+                  isSubmitting ||
+                  (!isDirty && !imagesHaveChanged()) ||
+                  images.length === 0
+                }
                 className='flex items-center gap-2'
               >
                 {isSubmitting ? (
