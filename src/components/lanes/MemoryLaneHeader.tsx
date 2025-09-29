@@ -11,11 +11,15 @@ import {
   Image as ImageIcon,
   Tag,
   Heart,
+  Share2,
+  Check,
+  Edit,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useAuthModal } from '@/contexts/AuthModalContext';
 import { PermissionGuard, OwnerOnly } from './PermissionGuard';
-import { memo } from 'react';
+import { useToast } from '@/components/ui/Toast';
+import { memo, useState } from 'react';
 
 interface MemoryLaneHeaderProps {
   lane: MemoryLane;
@@ -29,9 +33,12 @@ export const MemoryLaneHeader = memo(function MemoryLaneHeader({
   lane,
   isOwner,
   className,
+  onEditLane,
   onDeleteLane,
 }: MemoryLaneHeaderProps) {
   const { openModal, setRedirectAfterAuth } = useAuthModal();
+  const [isCopied, setIsCopied] = useState(false);
+  const { addToast } = useToast();
 
   const memoryCount = lane.memories?.length || 0;
   const totalImages =
@@ -48,6 +55,61 @@ export const MemoryLaneHeader = memo(function MemoryLaneHeader({
   const handleSignInClick = () => {
     setRedirectAfterAuth(`/lanes/${lane.id}`);
     openModal('login');
+  };
+
+  const handleShare = async () => {
+    try {
+      const url = `${window.location.origin}/lanes/${lane.id}`;
+      await navigator.clipboard.writeText(url);
+      setIsCopied(true);
+      addToast({
+        type: 'success',
+        title: 'Link Copied!',
+        message: 'Memory lane link has been copied to your clipboard.',
+        duration: 3000,
+      });
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy link:', error);
+      // Fallback for older browsers
+      try {
+        const textArea = document.createElement('textarea');
+        textArea.value = `${window.location.origin}/lanes/${lane.id}`;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        setIsCopied(true);
+        addToast({
+          type: 'success',
+          title: 'Link Copied!',
+          message: 'Memory lane link has been copied to your clipboard.',
+          duration: 3000,
+        });
+        setTimeout(() => setIsCopied(false), 2000);
+      } catch (fallbackError) {
+        console.error('Fallback copy also failed:', fallbackError);
+        addToast({
+          type: 'error',
+          title: 'Copy Failed',
+          message: 'Unable to copy link automatically. Please copy manually.',
+          duration: 5000,
+        });
+        // Show a prompt with the URL as a last resort
+        const userInput = prompt(
+          'Copy this link manually:',
+          `${window.location.origin}/lanes/${lane.id}`
+        );
+        if (userInput) {
+          addToast({
+            type: 'info',
+            title: 'Link Ready',
+            message: 'You can now paste the link wherever you need it.',
+            duration: 3000,
+          });
+        }
+      }
+    }
   };
 
   const formatDate = (date: Date) => {
@@ -167,11 +229,42 @@ export const MemoryLaneHeader = memo(function MemoryLaneHeader({
 
               {/* Action Buttons */}
               <div className='lg:col-span-1'>
+                {/* Share Button - Available to all users */}
+                <div className='mb-4'>
+                  <Button
+                    onClick={handleShare}
+                    variant='outline'
+                    size='lg'
+                    className='w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white border-white/30 hover:border-white/50 transition-all duration-200 shadow-lg'
+                  >
+                    {isCopied ? (
+                      <>
+                        <Check className='w-5 h-5 mr-2' />
+                        Link Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Share2 className='w-5 h-5 mr-2' />
+                        Share Lane
+                      </>
+                    )}
+                  </Button>
+                </div>
+
                 <OwnerOnly
                   isOwner={isOwner}
                   redirectAfterAuth={`/lanes/${lane.id}`}
                 >
                   <div className='space-y-4'>
+                    <Button
+                      onClick={() => onEditLane?.()}
+                      variant='outline'
+                      size='lg'
+                      className='w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white border-white/30 hover:border-white/50 transition-all duration-200 shadow-lg'
+                    >
+                      <Edit className='w-5 h-5 mr-2' />
+                      Edit Lane
+                    </Button>
                     <Button
                       onClick={handleDelete}
                       variant='outline'

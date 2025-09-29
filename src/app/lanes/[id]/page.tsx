@@ -8,9 +8,10 @@ import { MemoryTimeline } from '@/components/lanes/MemoryTimeline';
 import { MemoryLaneSkeleton } from '@/components/lanes/MemoryLaneSkeleton';
 import { MemoryLaneErrorBoundary } from '@/components/lanes/MemoryLaneErrorBoundary';
 import { DeleteLaneDialog } from '@/components/lanes/DeleteLaneDialog';
-import { useMemoryLane } from '@/hooks/useMemoryLanes';
+import { useMemoryLane } from '@/hooks/useMemoryLane';
 import { useMemoryLaneManagement } from '@/hooks/useMemoryLaneManagement';
 import { useAuth } from '@/contexts/AuthContext';
+import { MemoryLaneFormModal } from '@/components/lanes/MemoryLaneFormModal';
 import Link from 'next/link';
 
 export default function MemoryLanePage() {
@@ -18,28 +19,21 @@ export default function MemoryLanePage() {
   const laneId = params.id as string;
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const {
     data: lane,
     isLoading: laneLoading,
     error: laneError,
-  } = useMemoryLane(laneId);
+  } = useMemoryLane({ laneId });
 
-  const { deleteMemoryLane, isDeleting } = useMemoryLaneManagement();
+  const { deleteMemoryLane, updateMemoryLane, isDeleting } =
+    useMemoryLaneManagement();
 
   // Check if the current user owns this lane
   const isOwner = Boolean(
     isAuthenticated && user && lane && user.id === lane.userId
   );
-
-  // Debug logging for ownership check
-  console.log('Ownership Debug:', {
-    isAuthenticated,
-    user: user ? { id: user.id, email: user.email } : null,
-    lane: lane ? { id: lane.id, userId: lane.userId, title: lane.title } : null,
-    isOwner,
-    userIdMatch: user && lane ? user.id === lane.userId : false,
-  });
 
   // Handle delete lane
   const handleDeleteLane = async () => {
@@ -52,13 +46,26 @@ export default function MemoryLanePage() {
     }
   };
 
-  // Debug logging
-  console.log('Memory Lane Page Debug:', {
-    isAuthenticated,
-    user: user ? { id: user.id, email: user.email } : null,
-    lane: lane ? { id: lane.id, userId: lane.userId, title: lane.title } : null,
-    isOwner,
-  });
+  // Handle edit lane
+  const handleEditLane = () => {
+    setShowEditModal(true);
+  };
+
+  // Handle edit form submit
+  const handleEditSubmit = async (data: {
+    title: string;
+    description?: string;
+    coverImageUrl?: string;
+    tagIds: string[];
+  }) => {
+    try {
+      await updateMemoryLane(laneId, data);
+      setShowEditModal(false);
+    } catch (error) {
+      console.error('Failed to update lane:', error);
+      // Error handling is done in the hook
+    }
+  };
 
   // Show loading state while checking authentication or loading lane
   if (authLoading || laneLoading) {
@@ -71,9 +78,13 @@ export default function MemoryLanePage() {
 
   // Show error state if lane failed to load
   if (laneError) {
+    const error =
+      laneError instanceof Error
+        ? laneError
+        : new Error('Failed to load memory lane');
     return (
       <Layout>
-        <MemoryLaneErrorBoundary error={laneError}>
+        <MemoryLaneErrorBoundary error={error}>
           <div className='min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center'>
             <div className='text-center'>
               <h1 className='text-2xl font-bold text-gray-900 dark:text-white mb-4'>
@@ -129,7 +140,7 @@ export default function MemoryLanePage() {
           <MemoryLaneHeader
             lane={lane}
             isOwner={isOwner}
-            onEditLane={() => console.log('Edit lane:', lane.id)}
+            onEditLane={handleEditLane}
             onDeleteLane={() => setShowDeleteDialog(true)}
           />
 
@@ -147,6 +158,14 @@ export default function MemoryLanePage() {
             onConfirm={handleDeleteLane}
             laneTitle={lane.title}
             isDeleting={isDeleting}
+          />
+
+          {/* Edit Lane Modal */}
+          <MemoryLaneFormModal
+            isOpen={showEditModal}
+            onClose={() => setShowEditModal(false)}
+            onSubmit={handleEditSubmit}
+            lane={lane}
           />
         </div>
       </MemoryLaneErrorBoundary>

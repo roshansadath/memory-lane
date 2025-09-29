@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiService } from '@/services/apiService';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Query keys
 export const queryKeys = {
@@ -45,12 +46,15 @@ export function useMemoryLane(id: string) {
   });
 }
 
-export function useMemoryLanesByTag(tagId: string) {
+export function useMemoryLanesByTag(
+  tagId: string,
+  options?: { enabled?: boolean }
+) {
   return useQuery({
     queryKey: queryKeys.list({ tagId }),
     queryFn: () => apiService.getMemoryLanes({ tagId }),
     select: data => data.data?.data || [],
-    enabled: !!tagId,
+    enabled: options?.enabled !== undefined ? options.enabled : !!tagId,
     staleTime: 5 * 60 * 1000,
   });
 }
@@ -92,6 +96,19 @@ export function useSearchMemoryLanes(query: string) {
     select: data => data.data?.data || [],
     enabled: query.length > 2,
     staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+}
+
+// Hook for user's own memory lanes
+export function useMyMemoryLanes(params?: UseMemoryLanesParams) {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: [...queryKeys.lists(), 'my', user?.id, params],
+    queryFn: () => apiService.getMyMemoryLanes(params),
+    select: data => data.data?.data || [],
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!user, // Only run query when user is authenticated
   });
 }
 
@@ -142,6 +159,7 @@ export function useCreateMemoryLane() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.lists() });
       queryClient.invalidateQueries({ queryKey: queryKeys.homePage() });
+      queryClient.invalidateQueries({ queryKey: [...queryKeys.lists(), 'my'] });
     },
   });
 }
@@ -166,6 +184,7 @@ export function useUpdateMemoryLane() {
       queryClient.invalidateQueries({ queryKey: queryKeys.lists() });
       queryClient.invalidateQueries({ queryKey: queryKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: queryKeys.homePage() });
+      queryClient.invalidateQueries({ queryKey: [...queryKeys.lists(), 'my'] });
     },
   });
 }
@@ -178,6 +197,7 @@ export function useDeleteMemoryLane() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.lists() });
       queryClient.invalidateQueries({ queryKey: queryKeys.homePage() });
+      queryClient.invalidateQueries({ queryKey: [...queryKeys.lists(), 'my'] });
     },
   });
 }

@@ -8,7 +8,7 @@ import { MemoryFormModal } from '@/components/lanes/MemoryFormModal';
 import { OwnerOnly } from './PermissionGuard';
 import { LoadingOverlay } from './LoadingStates';
 import { FadeIn, StaggeredFadeIn } from './Transitions';
-import { useMemoryLane } from '@/hooks/useMemoryLanes';
+import { useMemoryLane } from '@/hooks/useMemoryLane';
 import { useMemoryManagement } from '@/hooks/useMemoryManagement';
 import { cn } from '@/lib/utils';
 import { Memory, CreateMemoryData } from '@/types';
@@ -33,7 +33,7 @@ export const MemoryTimeline = memo(function MemoryTimeline({
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingMemory, setEditingMemory] = useState<Memory | null>(null);
 
-  const { data: lane, isLoading, error } = useMemoryLane(laneId);
+  const { data: lane, isLoading, error } = useMemoryLane({ laneId });
 
   const { createMemory, updateMemory, deleteMemory, isCreating, isUpdating } =
     useMemoryManagement();

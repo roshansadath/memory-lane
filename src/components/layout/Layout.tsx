@@ -2,7 +2,7 @@
 
 import { Header } from './Header';
 import { AuthModal } from '@/components/auth/AuthModal';
-import { AuthModalProvider, useAuthModal } from '@/contexts/AuthModalContext';
+import { useAuthModal } from '@/contexts/AuthModalContext';
 import { cn } from '@/lib/utils';
 
 interface LayoutProps {
@@ -11,7 +11,7 @@ interface LayoutProps {
   onSearchClick?: () => void;
 }
 
-function LayoutContent({ className, children, onSearchClick }: LayoutProps) {
+export function Layout({ className, children, onSearchClick }: LayoutProps) {
   const { isOpen, defaultTab, closeModal, redirectAfterAuth } = useAuthModal();
 
   const handleSearchClick = () => {
@@ -32,15 +32,5 @@ function LayoutContent({ className, children, onSearchClick }: LayoutProps) {
         redirectAfterAuth={redirectAfterAuth}
       />
     </div>
-  );
-}
-
-export function Layout({ className, children, onSearchClick }: LayoutProps) {
-  return (
-    <AuthModalProvider>
-      <LayoutContent className={className} onSearchClick={onSearchClick}>
-        {children}
-      </LayoutContent>
-    </AuthModalProvider>
   );
 }

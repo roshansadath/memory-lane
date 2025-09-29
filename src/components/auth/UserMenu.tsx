@@ -72,33 +72,11 @@ export function UserMenu() {
           </div>
 
           <button
-            onClick={() => {
-              // TODO: Navigate to profile page
-              setIsOpen(false);
-            }}
-            className='block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
+            onClick={handleLogout}
+            className='block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50'
           >
-            Profile
+            Sign out
           </button>
-
-          <button
-            onClick={() => {
-              // TODO: Navigate to settings page
-              setIsOpen(false);
-            }}
-            className='block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
-          >
-            Settings
-          </button>
-
-          <div className='border-t border-gray-100'>
-            <button
-              onClick={handleLogout}
-              className='block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50'
-            >
-              Sign out
-            </button>
-          </div>
         </div>
       )}
     </div>
