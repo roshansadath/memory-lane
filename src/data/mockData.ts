@@ -133,6 +133,7 @@ export const mockLaneTags: LaneTag[] = [
 export const mockMemoryLanes: MemoryLane[] = [
   {
     id: 'lane1',
+    userId: 'user1',
     slug: 'summer-adventures-2024',
     title: 'Summer Adventures 2024',
     description: 'All the amazing outdoor adventures from summer 2024',
@@ -145,6 +146,7 @@ export const mockMemoryLanes: MemoryLane[] = [
   },
   {
     id: 'lane2',
+    userId: 'user1',
     slug: 'family-moments',
     title: 'Family Moments',
     description: 'Precious memories with family and loved ones',
@@ -157,6 +159,7 @@ export const mockMemoryLanes: MemoryLane[] = [
   },
   {
     id: 'lane3',
+    userId: 'user2',
     slug: 'mountain-expeditions',
     title: 'Mountain Expeditions',
     description: 'Challenging climbs and breathtaking mountain views',
@@ -169,6 +172,7 @@ export const mockMemoryLanes: MemoryLane[] = [
   },
   {
     id: 'lane4',
+    userId: 'user1',
     slug: 'work-milestones',
     title: 'Work Milestones',
     description: 'Important achievements and career highlights',
@@ -181,6 +185,7 @@ export const mockMemoryLanes: MemoryLane[] = [
   },
   {
     id: 'lane5',
+    userId: 'user2',
     slug: 'holiday-celebrations',
     title: 'Holiday Celebrations',
     description: 'Special moments from holidays and celebrations',

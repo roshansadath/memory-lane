@@ -2,6 +2,7 @@
 
 import { MemoryLane, TagWithLanes } from '@/types';
 import { LaneCarousel } from './LaneCarousel';
+import { cn } from '@/lib/utils';
 
 interface TagSectionProps {
   tag: TagWithLanes;
@@ -38,13 +39,14 @@ export function TagSection({
   }
 
   return (
-    <LaneCarousel
-      lanes={lanes}
-      title={tag.name}
-      onLaneClick={onLaneClick}
-      className={className}
-      isLoading={false}
-      showNavigation={showNavigation}
-    />
+    <div className={cn('relative', className)}>
+      <LaneCarousel
+        lanes={lanes}
+        title={tag.name}
+        onLaneClick={onLaneClick}
+        isLoading={false}
+        showNavigation={showNavigation}
+      />
+    </div>
   );
 }

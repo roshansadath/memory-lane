@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { QueryProvider } from '@/providers/QueryProvider';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { AuthModalProvider } from '@/contexts/AuthModalContext';
 import { ToastProvider } from '@/components/ui/Toast';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
@@ -34,7 +35,9 @@ export default function RootLayout({
         <ErrorBoundary>
           <QueryProvider>
             <AuthProvider>
-              <ToastProvider>{children}</ToastProvider>
+              <AuthModalProvider>
+                <ToastProvider>{children}</ToastProvider>
+              </AuthModalProvider>
             </AuthProvider>
           </QueryProvider>
         </ErrorBoundary>

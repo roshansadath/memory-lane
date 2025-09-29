@@ -42,11 +42,11 @@ export const LaneCarousel = memo(function LaneCarousel({
           {title}
         </h2>
         <Carousel className='w-full'>
-          <CarouselContent className='-ml-2 md:-ml-4'>
+          <CarouselContent className='-ml-4 sm:-ml-6 md:-ml-8'>
             {Array.from({ length: 6 }).map((_, index) => (
               <CarouselItem
                 key={index}
-                className='pl-2 md:pl-4 basis-3/4 sm:basis-1/2 md:basis-1/2 lg:basis-1/3 xl:basis-1/4'
+                className='pl-4 sm:pl-6 md:pl-8 basis-3/4 sm:basis-1/2 md:basis-1/2 lg:basis-1/3 xl:basis-1/4'
               >
                 <LaneCardSkeleton />
               </CarouselItem>
@@ -73,42 +73,48 @@ export const LaneCarousel = memo(function LaneCarousel({
   }
 
   return (
-    <div className={cn('space-y-4', className)}>
-      <h2 className='text-xl font-semibold text-gray-900 dark:text-white'>
-        {title}
-      </h2>
+    <div className={cn('space-y-6', className)}>
+      {title && (
+        <div className='text-center'>
+          <h2 className='text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2'>
+            {title}
+          </h2>
+        </div>
+      )}
 
-      <Carousel
-        className='w-full'
-        opts={{
-          align: 'start',
-          loop: false,
-          skipSnaps: false,
-          dragFree: true,
-        }}
-      >
-        <CarouselContent className='-ml-2 md:-ml-4'>
-          {lanes.map(lane => (
-            <CarouselItem
-              key={lane.id}
-              className='pl-2 md:pl-4 basis-3/4 sm:basis-1/2 md:basis-1/2 lg:basis-1/3 xl:basis-1/4'
-            >
-              <LaneCard
-                lane={lane}
-                onClick={handleLaneClick}
-                className='h-full'
-              />
-            </CarouselItem>
-          ))}
-        </CarouselContent>
+      <div className='relative'>
+        <Carousel
+          className='w-full'
+          opts={{
+            align: 'start',
+            loop: false,
+            skipSnaps: false,
+            dragFree: true,
+          }}
+        >
+          <CarouselContent className='p-4 sm:p-6 md:p-8 -ml-4 sm:-ml-6 md:-ml-8'>
+            {lanes.map(lane => (
+              <CarouselItem
+                key={lane.id}
+                className='pl-10 pr-4 sm:pl-6 md:pl-8 basis-[85%] sm:basis-2/3 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 2xl:basis-1/4 '
+              >
+                <LaneCard
+                  lane={lane}
+                  onClick={handleLaneClick}
+                  className='h-full'
+                />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
 
-        {showNavigation && lanes.length > 4 && (
-          <>
-            <CarouselPrevious className='left-2 md:left-4' />
-            <CarouselNext className='right-2 md:right-4' />
-          </>
-        )}
-      </Carousel>
+          {showNavigation && lanes.length > 4 && (
+            <>
+              <CarouselPrevious className='left-4 sm:left-6 md:left-8 bg-white/90 hover:bg-white shadow-lg border-gray-200' />
+              <CarouselNext className='right-4 sm:right-6 md:right-8 bg-white/90 hover:bg-white shadow-lg border-gray-200' />
+            </>
+          )}
+        </Carousel>
+      </div>
     </div>
   );
 });

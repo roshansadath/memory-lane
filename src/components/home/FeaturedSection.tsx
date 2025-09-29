@@ -18,13 +18,13 @@ export const FeaturedSection = memo(function FeaturedSection({
   }
 
   return (
-    <section className='space-y-4'>
-      <div className='px-4 sm:px-6 lg:px-8'>
-        <h2 className='text-2xl font-bold text-gray-900 dark:text-white mb-2'>
+    <section className='space-y-6'>
+      <div className='text-center'>
+        <h2 className='text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4'>
           Featured Memory Lanes
         </h2>
-        <p className='text-gray-600 dark:text-gray-300'>
-          Discover our most popular memory collections
+        <p className='text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto'>
+          Discover our most popular memory collections curated by our community
         </p>
       </div>
       <LaneCarousel

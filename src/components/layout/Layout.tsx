@@ -1,6 +1,8 @@
 'use client';
 
 import { Header } from './Header';
+import { AuthModal } from '@/components/auth/AuthModal';
+import { AuthModalProvider, useAuthModal } from '@/contexts/AuthModalContext';
 import { cn } from '@/lib/utils';
 
 interface LayoutProps {
@@ -9,7 +11,9 @@ interface LayoutProps {
   onSearchClick?: () => void;
 }
 
-export function Layout({ className, children, onSearchClick }: LayoutProps) {
+function LayoutContent({ className, children, onSearchClick }: LayoutProps) {
+  const { isOpen, defaultTab, closeModal, redirectAfterAuth } = useAuthModal();
+
   const handleSearchClick = () => {
     console.log('Search clicked');
     // TODO: Open search modal or navigate to search page
@@ -17,9 +21,26 @@ export function Layout({ className, children, onSearchClick }: LayoutProps) {
   };
 
   return (
-    <div className={cn('min-h-screen bg-gray-50 dark:bg-gray-900', className)}>
+    <div className={cn('min-h-screen', className)}>
       <Header onSearchClick={handleSearchClick} />
-      <main className='max-w-7xl mx-auto'>{children}</main>
+      <main>{children}</main>
+
+      <AuthModal
+        isOpen={isOpen}
+        onClose={closeModal}
+        defaultTab={defaultTab}
+        redirectAfterAuth={redirectAfterAuth}
+      />
     </div>
+  );
+}
+
+export function Layout({ className, children, onSearchClick }: LayoutProps) {
+  return (
+    <AuthModalProvider>
+      <LayoutContent className={className} onSearchClick={onSearchClick}>
+        {children}
+      </LayoutContent>
+    </AuthModalProvider>
   );
 }

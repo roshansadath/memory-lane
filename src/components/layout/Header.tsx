@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Menu, X, Search } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { AuthModal } from '@/components/auth/AuthModal';
+import { useAuthModal } from '@/contexts/AuthModalContext';
 import { UserMenu } from '@/components/auth/UserMenu';
 
 interface HeaderProps {
@@ -16,23 +16,15 @@ interface HeaderProps {
 
 export function Header({ className, onSearchClick }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [authModalTab, setAuthModalTab] = useState<'login' | 'register'>(
-    'login'
-  );
   const { isAuthenticated, isLoading } = useAuth();
+  const { openModal } = useAuthModal();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   const handleAuthClick = (tab: 'login' | 'register') => {
-    setAuthModalTab(tab);
-    setIsAuthModalOpen(true);
-  };
-
-  const handleCloseAuthModal = () => {
-    setIsAuthModalOpen(false);
+    openModal(tab);
   };
 
   return (
@@ -58,24 +50,24 @@ export function Header({ className, onSearchClick }: HeaderProps) {
 
           {/* Desktop Navigation */}
           <nav className='hidden md:flex items-center space-x-8'>
-            <a
-              href='#'
+            <Link
+              href='/'
               className='text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors font-medium'
             >
               Home
-            </a>
-            <a
-              href='#'
+            </Link>
+            <Link
+              href='/lanes'
               className='text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors font-medium'
             >
               My Lanes
-            </a>
-            <a
-              href='#'
+            </Link>
+            <Link
+              href='/explore'
               className='text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors font-medium'
             >
               Explore
-            </a>
+            </Link>
           </nav>
 
           {/* Desktop Actions */}
@@ -135,27 +127,27 @@ export function Header({ className, onSearchClick }: HeaderProps) {
         {isMobileMenuOpen && (
           <div className='md:hidden border-t border-gray-200 dark:border-gray-700'>
             <div className='px-2 pt-2 pb-3 space-y-1'>
-              <a
-                href='#'
+              <Link
+                href='/'
                 className='block px-3 py-2 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors font-medium'
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Home
-              </a>
-              <a
-                href='#'
+              </Link>
+              <Link
+                href='/lanes'
                 className='block px-3 py-2 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors font-medium'
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 My Lanes
-              </a>
-              <a
-                href='#'
+              </Link>
+              <Link
+                href='/explore'
                 className='block px-3 py-2 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors font-medium'
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Explore
-              </a>
+              </Link>
               <div className='pt-4 border-t border-gray-200 dark:border-gray-700'>
                 {isAuthenticated ? (
                   <div className='px-3 py-2'>
@@ -189,12 +181,6 @@ export function Header({ className, onSearchClick }: HeaderProps) {
           </div>
         )}
       </div>
-
-      <AuthModal
-        isOpen={isAuthModalOpen}
-        onClose={handleCloseAuthModal}
-        defaultTab={authModalTab}
-      />
     </header>
   );
 }
